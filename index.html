@@ -39,6 +39,14 @@
             font-size: 28px;
         }
         
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
         .week-info {
             margin-top: 8px;
             color: #666;
@@ -50,21 +58,66 @@
             margin-top: 5px;
             font-size: 12px;
             color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .sync-status.online { color: #2e7d32; }
         .sync-status.offline { color: #c62828; }
         
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #555;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
         .table-container {
             background: white;
             padding: 0 30px 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow-x: auto;
         }
         
         table { 
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
+            min-width: 600px;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
@@ -163,6 +216,56 @@
             color: #c2185b;
         }
         
+        .stats-container {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stats-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stat-card.warning {
+            border-left-color: #f57c00;
+            background: #fff8e1;
+        }
+        
+        .stat-card.danger {
+            border-left-color: #c62828;
+            background: #ffebee;
+        }
+        
         .footer {
             background: white;
             border-radius: 0 0 16px 16px;
@@ -179,10 +282,16 @@
             margin-bottom: 15px;
             display: none;
             border-left: 4px solid #c62828;
+            animation: slideDown 0.3s ease;
         }
         
         .error.show {
             display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .legend {
@@ -224,33 +333,111 @@
             padding: 40px;
             color: #666;
         }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            height: 40px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .success-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2e7d32;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+        
+        .success-toast.show {
+            display: block;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 15px 10px; }
+            .container { max-width: 100%; }
+            .header { padding: 20px; border-radius: 12px 12px 0 0; }
+            .header h1 { font-size: 20px; }
+            .table-container { padding: 0 15px 20px; }
+            .stats-container { padding: 15px 20px; }
+            th, td { padding: 10px 8px; font-size: 12px; }
+            select { font-size: 12px; padding: 6px 10px; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .actions, .sync-status, .btn { display: none !important; }
+            .container { max-width: 100%; }
+            .header, .table-container, .stats-container, .footer { 
+                box-shadow: none; 
+                page-break-inside: avoid;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1><span>📊</span> Reporting Team Schedule</h1>
-            <div class="week-info"></div>
-            <div id="syncStatus" class="sync-status">⏳ Connecting...</div>
+            <div class="header-row">
+                <div>
+                    <h1><span>📊</span> Reporting Team Schedule</h1>
+                    <div class="week-info"></div>
+                    <div id="syncStatus" class="sync-status">
+                        <span>⏳</span>
+                        <span>Connecting...</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="exportToCSV()" title="Export schedule to CSV">
+                        📥 Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()" title="Print schedule">
+                        🖨️ Print
+                    </button>
+                </div>
+            </div>
         </div>
         
         <div class="table-container">
-            <div id="errors" class="error"></div>
-            <table id="schedule">
+            <div id="errors" class="error" role="alert" aria-live="assertive"></div>
+            <table id="schedule" role="grid" aria-label="Weekly schedule">
                 <thead>
-                    <tr>
-                        <th>Team Member</th>
-                        <th>Sun</th>
-                        <th>Mon</th>
-                        <th>Tue</th>
-                        <th>Wed</th>
-                        <th>Thu</th>
+                    <tr role="row">
+                        <th role="columnheader">Team Member</th>
+                        <th role="columnheader">Sun</th>
+                        <th role="columnheader">Mon</th>
+                        <th role="columnheader">Tue</th>
+                        <th role="columnheader">Wed</th>
+                        <th role="columnheader">Thu</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr><td colspan="6" class="loading">Loading schedule...</td></tr>
                 </tbody>
             </table>
+        </div>
+        
+        <div class="stats-container" id="statsContainer" style="display: none;">
+            <div class="stats-title">📈 Weekly Statistics</div>
+            <div class="stats-grid" id="statsGrid"></div>
         </div>
         
         <div class="footer">
@@ -270,18 +457,14 @@
             </div>
         </div>
     </div>
+    
+    <div id="successToast" class="success-toast">✓ Schedule updated</div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <script>
-        // Error handling for debugging
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            document.body.innerHTML = '<div style="padding:20px;color:red;font-family:monospace;">ERROR: ' + msg + '<br>Line: ' + lineNo + '</div>';
-            return false;
-        };
-        
         // ========================================
         // 🔧 FIREBASE CONFIG
         // ========================================
@@ -297,14 +480,9 @@
         };
         
         // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var database = firebase.database();
-        } catch (error) {
-            console.error("Firebase init error:", error);
-            document.getElementById('syncStatus').textContent = '⚠️ Firebase error: ' + error.message;
-            document.getElementById('syncStatus').className = 'sync-status offline';
-        }
+        let saveTimeout = null;
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
         
         // ========================================
         // TEAM MEMBERS - Edit this list
@@ -321,6 +499,7 @@
         
         let schedule = {};
         let dbRef = null;
+        let isInitialLoad = true;
         
         // Calculate week dates dynamically
         function getWeekDates() {
@@ -422,18 +601,125 @@
         function updateSyncStatus(connected) {
             const status = document.getElementById('syncStatus');
             if (connected) {
-                status.textContent = '🟢 Live - Changes sync automatically';
+                status.innerHTML = '<span>🟢</span><span>Live - Changes sync automatically</span>';
                 status.className = 'sync-status online';
             } else {
-                status.textContent = '🔴 Offline - Changes will sync when reconnected';
+                status.innerHTML = '<span>🔴</span><span>Offline - Changes will sync when reconnected</span>';
                 status.className = 'sync-status offline';
             }
         }
         
         function saveSchedule() {
             if (dbRef) {
-                dbRef.set(schedule);
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    dbRef.set(schedule).then(() => {
+                        showSuccessToast();
+                    });
+                }, 500);
             }
+        }
+        
+        function showSuccessToast() {
+            const toast = document.getElementById('successToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        function calculateStats() {
+            const stats = {
+                totalWFH: {},
+                daysWithLowCoverage: 0,
+                totalLeave: 0
+            };
+            
+            teamMembers.forEach(name => {
+                let wfhCount = 0;
+                let leaveCount = 0;
+                days.forEach(day => {
+                    if (schedule[name] && schedule[name][day] === 'wfh') wfhCount++;
+                    if (schedule[name] && schedule[name][day] === 'leave') leaveCount++;
+                });
+                stats.totalWFH[name] = wfhCount;
+                stats.totalLeave += leaveCount;
+            });
+            
+            days.forEach(day => {
+                let officeCount = 0;
+                teamMembers.forEach(name => {
+                    if (schedule[name] && schedule[name][day] === 'office') officeCount++;
+                });
+                if (officeCount < 2) stats.daysWithLowCoverage++;
+            });
+            
+            return stats;
+        }
+        
+        function renderStats() {
+            const stats = calculateStats();
+            const statsGrid = document.getElementById('statsGrid');
+            const statsContainer = document.getElementById('statsContainer');
+            
+            statsGrid.innerHTML = '';
+            
+            // Per-person WFH stats
+            teamMembers.forEach(name => {
+                const wfhCount = stats.totalWFH[name];
+                const card = document.createElement('div');
+                card.className = 'stat-card' + (wfhCount >= 2 ? ' warning' : '');
+                card.innerHTML = `
+                    <div class="stat-label">${name} - WFH Days</div>
+                    <div class="stat-value">${wfhCount}/2</div>
+                `;
+                statsGrid.appendChild(card);
+            });
+            
+            // Days with low coverage
+            if (stats.daysWithLowCoverage > 0) {
+                const card = document.createElement('div');
+                card.className = 'stat-card danger';
+                card.innerHTML = `
+                    <div class="stat-label">⚠️ Low Coverage Days</div>
+                    <div class="stat-value">${stats.daysWithLowCoverage}</div>
+                `;
+                statsGrid.appendChild(card);
+            }
+            
+            statsContainer.style.display = 'block';
+        }
+        
+        function exportToCSV() {
+            let csv = 'Team Member,' + dayNames.join(',') + '\n';
+            
+            teamMembers.forEach(name => {
+                let row = name;
+                days.forEach(day => {
+                    const value = schedule[name] && schedule[name][day] ? schedule[name][day] : 'office';
+                    const label = value === 'office' ? 'In Office' : 
+                                  value === 'wfh' ? 'Work from Home' : 'Leave';
+                    row += ',' + label;
+                });
+                csv += row + '\n';
+            });
+            
+            csv += '\nIn Office Total';
+            days.forEach(day => {
+                let count = 0;
+                teamMembers.forEach(name => {
+                    if (schedule[name] && schedule[name][day] === 'office') count++;
+                });
+                csv += ',' + count;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `team-schedule-${weekKey}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
         }
         
         function renderTable() {
@@ -447,13 +733,16 @@
                 }
                 
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${name}</td>`;
+                row.setAttribute('role', 'row');
+                row.innerHTML = `<td role="gridcell">${name}</td>`;
                 
                 days.forEach(day => {
                     const cell = document.createElement('td');
+                    cell.setAttribute('role', 'gridcell');
                     const select = document.createElement('select');
                     select.dataset.name = name;
                     select.dataset.day = day;
+                    select.setAttribute('aria-label', `${name} schedule for ${dayNames[days.indexOf(day)]}`);
                     select.innerHTML = `
                         <option value="office">In Office</option>
                         <option value="wfh">Work from Home</option>
@@ -472,18 +761,26 @@
             // Add totals row
             const totalsRow = document.createElement('tr');
             totalsRow.id = 'totals-row';
-            totalsRow.innerHTML = '<td>In Office Total</td>';
+            totalsRow.setAttribute('role', 'row');
+            totalsRow.innerHTML = '<td role="gridcell">In Office Total</td>';
             days.forEach(day => {
                 let count = 0;
                 teamMembers.forEach(name => {
                     if (schedule[name] && schedule[name][day] === 'office') count++;
                 });
                 const cell = document.createElement('td');
+                cell.setAttribute('role', 'gridcell');
                 cell.className = count < 2 ? 'count-bad' : 'count-good';
                 cell.textContent = count;
                 totalsRow.appendChild(cell);
             });
             tbody.appendChild(totalsRow);
+            
+            // Show stats after initial load
+            if (!isInitialLoad) {
+                renderStats();
+            }
+            isInitialLoad = false;
         }
         
         function handleChange(e) {
@@ -509,6 +806,7 @@
                 document.getElementById('errors').classList.remove('show');
                 e.target.className = newValue;
                 updateTotalsRow();
+                renderStats();
                 saveSchedule();
             }
         }
