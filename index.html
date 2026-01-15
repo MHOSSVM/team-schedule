@@ -276,6 +276,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <script>
+        // Error handling for debugging
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            document.body.innerHTML = '<div style="padding:20px;color:red;font-family:monospace;">ERROR: ' + msg + '<br>Line: ' + lineNo + '</div>';
+            return false;
+        };
+        
         // ========================================
         // 🔧 FIREBASE CONFIG
         // ========================================
@@ -291,8 +297,14 @@
         };
         
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        try {
+            firebase.initializeApp(firebaseConfig);
+            var database = firebase.database();
+        } catch (error) {
+            console.error("Firebase init error:", error);
+            document.getElementById('syncStatus').textContent = '⚠️ Firebase error: ' + error.message;
+            document.getElementById('syncStatus').className = 'sync-status offline';
+        }
         
         // ========================================
         // TEAM MEMBERS - Edit this list
