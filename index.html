@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting Team - WFH Schedule</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 16px 16px 0 0;
+            padding: 25px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header h1 span {
+            font-size: 28px;
+        }
+        
+        .week-info {
+            margin-top: 8px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .sync-status {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .sync-status.online { color: #2e7d32; }
+        .sync-status.offline { color: #c62828; }
+        
+        .table-container {
+            background: white;
+            padding: 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        table { 
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        th, td { 
+            padding: 14px 12px;
+            text-align: center;
+        }
+        
+        th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 500;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        th:first-child { 
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+        
+        tbody tr:not(:last-child) td {
+            border-bottom: 1px solid #eee;
+        }
+        
+        td:first-child { 
+            font-weight: 600;
+            text-align: left;
+            padding-left: 20px;
+            color: #333;
+        }
+        
+        #totals-row td:first-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        #totals-row td {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        select { 
+            padding: 8px 12px;
+            width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+        
+        select:hover {
+            border-color: #667eea;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        select.office { 
+            background-color: #e8f5e9;
+            border-color: #81c784;
+            color: #2e7d32;
+        }
+        
+        select.wfh { 
+            background-color: #fff8e1;
+            border-color: #ffb74d;
+            color: #f57c00;
+        }
+        
+        select.leave { 
+            background-color: #fce4ec;
+            border-color: #f48fb1;
+            color: #c2185b;
+        }
+        
+        .footer {
+            background: white;
+            border-radius: 0 0 16px 16px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .error { 
+            background: #ffebee;
+            color: #c62828;
+            font-size: 13px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            border-left: 4px solid #c62828;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+        }
+        
+        .legend-dot.office { background: #81c784; }
+        .legend-dot.wfh { background: #ffb74d; }
+        .legend-dot.leave { background: #f48fb1; }
+        
+        .count-good {
+            background: #e8f5e9 !important;
+            color: #2e7d32 !important;
+        }
+        
+        .count-bad {
+            background: #ffebee !important;
+            color: #c62828 !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span>📊</span> Reporting Team Schedule</h1>
+            <div class="week-info"></div>
+            <div id="syncStatus" class="sync-status">⏳ Connecting...</div>
+        </div>
+        
+        <div class="table-container">
+            <div id="errors" class="error"></div>
+            <table id="schedule">
+                <thead>
+                    <tr>
+                        <th>Team Member</th>
+                        <th>Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" class="loading">Loading schedule...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot office"></div>
+                    <span>In Office</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot wfh"></div>
+                    <span>Work from Home</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot leave"></div>
+                    <span>Leave</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // ========================================
+        // 🔧 FIREBASE CONFIG
+        // ========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTeLGBNyKM_iovfD5Yy6AULMKilMWksIw",
+            authDomain: "office-management-f6a2c.firebaseapp.com",
+            databaseURL: "https://office-management-f6a2c-default-rtdb.firebaseio.com",
+            projectId: "office-management-f6a2c",
+            storageBucket: "office-management-f6a2c.firebasestorage.app",
+            messagingSenderId: "59767971834",
+            appId: "1:59767971834:web:ad1bcd5d02a83bacb50e43",
+            measurementId: "G-378TLMH7C4"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // ========================================
+        // TEAM MEMBERS - Edit this list
+        // ========================================
+        const teamMembers = [
+            'Ahmed Hassan',
+            'Sara Mohamed',
+            'Omar Ali',
+            'Fatima Khalid',
+            'Youssef Ibrahim'
+        ];
+        
+        const days = ['sun', 'mon', 'tue', 'wed', 'thu'];
+        const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        
+        let schedule = {};
+        let dbRef = null;
+        
+        // Calculate week dates dynamically
+        function getWeekDates() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            
+            let startDate = new Date(today);
+            
+            if (dayOfWeek === 5) {
+                startDate.setDate(today.getDate() + 2);
+            } else if (dayOfWeek === 6) {
+                startDate.setDate(today.getDate() + 1);
+            } else {
+                startDate.setDate(today.getDate() - dayOfWeek);
+            }
+            
+            const dates = [];
+            for (let i = 0; i < 5; i++) {
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                dates.push(d);
+            }
+            return dates;
+        }
+        
+        function formatDate(date) {
+            return date.getDate();
+        }
+        
+        function formatWeekRange(dates) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const start = dates[0];
+            const end = dates[4];
+            const startMonth = months[start.getMonth()];
+            const endMonth = months[end.getMonth()];
+            const year = end.getFullYear();
+            
+            if (startMonth === endMonth) {
+                return `Week: Sunday, ${startMonth} ${start.getDate()} - Thursday, ${startMonth} ${end.getDate()}, ${year}`;
+            } else {
+                return `Week: Sunday, ${startMonth} ${start.getDate()} - Thursday, ${endMonth} ${end.getDate()}, ${year}`;
+            }
+        }
+        
+        function getWeekKey(dates) {
+            return 'week_' + dates[0].toISOString().split('T')[0];
+        }
+        
+        const weekDates = getWeekDates();
+        const dayNames = weekDates.map((d, i) => `${dayLabels[i]} ${formatDate(d)}`);
+        const weekKey = getWeekKey(weekDates);
+        
+        // Update header
+        document.querySelector('.week-info').textContent = formatWeekRange(weekDates);
+        
+        // Update table headers
+        const headerRow = document.querySelector('#schedule thead tr');
+        headerRow.innerHTML = '<th>Team Member</th>' + dayNames.map(d => `<th>${d}</th>`).join('');
+        
+        // Initialize default schedule
+        function getDefaultSchedule() {
+            const defaultSchedule = {};
+            teamMembers.forEach(name => {
+                defaultSchedule[name] = {};
+                days.forEach(day => {
+                    defaultSchedule[name][day] = 'office';
+                });
+            });
+            return defaultSchedule;
+        }
+        
+        // Connect to Firebase and listen for changes
+        function initFirebase() {
+            dbRef = database.ref('schedules/' + weekKey);
+            
+            // Listen for real-time updates
+            dbRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    schedule = data;
+                } else {
+                    // First time - initialize with defaults
+                    schedule = getDefaultSchedule();
+                    dbRef.set(schedule);
+                }
+                renderTable();
+                updateSyncStatus(true);
+            }, (error) => {
+                console.error('Firebase error:', error);
+                updateSyncStatus(false);
+            });
+            
+            // Monitor connection state
+            database.ref('.info/connected').on('value', (snap) => {
+                updateSyncStatus(snap.val() === true);
+            });
+        }
+        
+        function updateSyncStatus(connected) {
+            const status = document.getElementById('syncStatus');
+            if (connected) {
+                status.textContent = '🟢 Live - Changes sync automatically';
+                status.className = 'sync-status online';
+            } else {
+                status.textContent = '🔴 Offline - Changes will sync when reconnected';
+                status.className = 'sync-status offline';
+            }
+        }
+        
+        function saveSchedule() {
+            if (dbRef) {
+                dbRef.set(schedule);
+            }
+        }
+        
+        function renderTable() {
+            const tbody = document.querySelector('#schedule tbody');
+            tbody.innerHTML = '';
+            
+            teamMembers.forEach(name => {
+                if (!schedule[name]) {
+                    schedule[name] = {};
+                    days.forEach(day => schedule[name][day] = 'office');
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${name}</td>`;
+                
+                days.forEach(day => {
+                    const cell = document.createElement('td');
+                    const select = document.createElement('select');
+                    select.dataset.name = name;
+                    select.dataset.day = day;
+                    select.innerHTML = `
+                        <option value="office">In Office</option>
+                        <option value="wfh">Work from Home</option>
+                        <option value="leave">Leave</option>
+                    `;
+                    select.value = schedule[name][day] || 'office';
+                    select.className = schedule[name][day] || 'office';
+                    select.onchange = handleChange;
+                    cell.appendChild(select);
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            });
+            
+            // Add totals row
+            const totalsRow = document.createElement('tr');
+            totalsRow.id = 'totals-row';
+            totalsRow.innerHTML = '<td>In Office Total</td>';
+            days.forEach(day => {
+                let count = 0;
+                teamMembers.forEach(name => {
+                    if (schedule[name] && schedule[name][day] === 'office') count++;
+                });
+                const cell = document.createElement('td');
+                cell.className = count < 2 ? 'count-bad' : 'count-good';
+                cell.textContent = count;
+                totalsRow.appendChild(cell);
+            });
+            tbody.appendChild(totalsRow);
+        }
+        
+        function handleChange(e) {
+            const name = e.target.dataset.name;
+            const day = e.target.dataset.day;
+            const newValue = e.target.value;
+            const oldValue = schedule[name][day];
+            
+            schedule[name][day] = newValue;
+            
+            const errors = validate(name, day, newValue);
+            
+            if (errors.length > 0) {
+                schedule[name][day] = oldValue;
+                e.target.value = oldValue;
+                document.getElementById('errors').textContent = errors.join(' | ');
+                document.getElementById('errors').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('errors').classList.remove('show');
+                }, 3000);
+            } else {
+                document.getElementById('errors').textContent = '';
+                document.getElementById('errors').classList.remove('show');
+                e.target.className = newValue;
+                updateTotalsRow();
+                saveSchedule();
+            }
+        }
+        
+        function validate(name, day, newValue) {
+            const errors = [];
+            
+            if (newValue === 'wfh') {
+                let wfhCount = 0;
+                days.forEach(d => {
+                    if (schedule[name][d] === 'wfh') wfhCount++;
+                });
+                if (wfhCount > 2) {
+                    errors.push(`${name.split(' ')[0]} already has 2 WFH days this week.`);
+                }
+                
+                let officeCount = 0;
+                teamMembers.forEach(member => {
+                    if (schedule[member] && schedule[member][day] === 'office') officeCount++;
+                });
+                if (officeCount < 2) {
+                    errors.push(`Need at least 2 people in office on ${dayNames[days.indexOf(day)]}.`);
+                }
+            }
+            
+            return errors;
+        }
+        
+        function updateTotalsRow() {
+            const totalsRow = document.getElementById('totals-row');
+            if (!totalsRow) return;
+            const cells = totalsRow.querySelectorAll('td');
+            days.forEach((day, i) => {
+                let count = 0;
+                teamMembers.forEach(name => {
+                    if (schedule[name] && schedule[name][day] === 'office') count++;
+                });
+                cells[i + 1].textContent = count;
+                cells[i + 1].className = count < 2 ? 'count-bad' : 'count-good';
+            });
+        }
+        
+        // Initialize
+        initFirebase();
+    </script>
+</body>
+</html>
